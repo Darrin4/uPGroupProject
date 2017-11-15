@@ -14,24 +14,20 @@ int  fractionInt = 0;
 int sign = 0;
 char temperature[20];
 unsigned char deg = 0xDF;
-void initializeTemp(void);
 
-void initializeTemp(void){
     
+
+void convertTemp(void){
     TRISCbits.TRISC2 = 0;
     PORTCbits.RC2 = 0;      //Port for pull-up   
     ow_reset();            //Master issues Reset Pulse
-}
 
-void convertTemp(void){
     ow_write_byte(0xCC);    //Master issues SKIP ROM command
     ow_write_byte(0x44);    //Master issues Convert T command
     PORTEbits.RE0 = 1;      //Enable pull-up
     Delay1KTCYx(800);
     PORTCbits.RC2 = 0;      //Disable strong pull-up
-}
 
-void readScratch(void){
     ow_write_byte(0xCC);
     ow_reset();
     ow_write_byte(0xBE);
@@ -64,8 +60,11 @@ void readScratch(void){
         fraction =0.0;
 
     }
-    
-    
+    while(BusyXLCD());
+    WriteCmdXLCD(0b00000001);
+    while(BusyXLCD())
+    SetDDRamAddr(0x00);
+    putsXLCD(temperature);  
+    OSTimeDlyHMSM ( 0, 0, 1, 0);
 }
-
 
