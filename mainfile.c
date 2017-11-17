@@ -4,7 +4,6 @@
 #include "delays.h"
 #include "tempSensor.h"
 #include <timers.h>
-#include <xlcd.h>
 #include <string.h>
 
 #pragma config OSC = HS
@@ -13,13 +12,16 @@
 
 #define _XTAL_FREQ 4000000UL
 
+extern void heartYou(void);
 unsigned char stopped = 0;
+unsigned char a = 0;
 
-//INT8U err;
-//OS_EVENT *tempSem;
-//OS_EVENT *tempEgSem;
+INT8U err;
+OS_EVENT *tempSem;
+OS_EVENT *heartSem;
+OS_EVENT *binSem;
 OS_STK TaskTempStk[100L];
-//OS_STK TaskTemp2Stk[100L];
+OS_STK TaskHeartStk[100L];
 
 void DelayFor18TCY(void){
     Delay10TCYx(2);
@@ -33,115 +35,113 @@ void DelayXLCD(void){
 
 void tempTask(void *pdata){
     while(stopped != 1){
-        while(BusyXLCD());
-        WriteCmdXLCD(0b00000001);
+        OSSemPend(binSem, 0, &err);
+        OSSemPend(tempSem, 0, &err);
+        Delay10KTCYx(10);
         convertTemp();
-        //OSSemPend(tempSem, 0, &err);
-        OSTimeDlyHMSM ( 0, 0, 1, 0);
-       // OSSemPost(tempSem);
-        OSTimeDlyHMSM ( 0, 0, 100, 0);
-    }
-    OSTaskDel(OS_PRIO_SELF);
-}
-/*
-void tempEg(void *pdata){
-    while(stopped != 1){
-        OSSemPend(tempEgSem, 0, &err);
-        while(BusyXLCD());
-        WriteCmdXLCD(0b00000001);
-        SetDDRamAddr(0x40);
-        OSTimeDlyHMSM ( 0, 0, 1, 0);
-        putrsXLCD("eg");
-        OSTimeDlyHMSM ( 0, 0, 100, 0);
         OSSemPost(tempSem);
-        OSTimeDlyHMSM ( 0, 0, 1, 0);
+        OSSemPost(binSem);
+        stopped = 1;
+        
     }
     OSTaskDel(OS_PRIO_SELF);
 }
-*/
+
+void heartTask(void *pdata){
+    stopped = 0;
+    while(stopped != 1){
+        OSSemPend(binSem, 0, &err);
+        OSSemPend(tempSem, 0, &err);
+        heartYou();
+        OSSemPost(tempSem);
+        OSSemPost(binSem);
+        stopped = 1;
+    }
+    OSTaskDel(OS_PRIO_SELF);
+}
+
 void keypadTest(void){
     if(!PORTCbits.RC7 && !PORTCbits.RC4 && !PORTCbits.RC5 && !PORTCbits.RC6){
         while(BusyXLCD());
-        SetDDRamAddr(0x00);
+        SetDDRamAddr(0x10);
         Delay1KTCYx(20);
         putrsXLCD("D");
     }else if(!PORTCbits.RC7 && PORTCbits.RC4 && !PORTCbits.RC5 && !PORTCbits.RC6){
         while(BusyXLCD());
-        SetDDRamAddr(0x00);
+        SetDDRamAddr(0x10);
         Delay1KTCYx(20);
         putrsXLCD("#");  
     }else if(!PORTCbits.RC7 && !PORTCbits.RC4 && PORTCbits.RC5 && !PORTCbits.RC6){
         while(BusyXLCD());
-        SetDDRamAddr(0x00);
+        SetDDRamAddr(0x10);
         Delay1KTCYx(20);
         putrsXLCD("0");  
     }else if(!PORTCbits.RC7 && PORTCbits.RC4 && PORTCbits.RC5 && !PORTCbits.RC6){
         while(BusyXLCD());
-        SetDDRamAddr(0x00);
+        SetDDRamAddr(0x10);
         Delay1KTCYx(20);
         putrsXLCD("*");  
     }else if(!PORTCbits.RC7 && !PORTCbits.RC4 && !PORTCbits.RC5 && PORTCbits.RC6){
         while(BusyXLCD());
-        SetDDRamAddr(0x00);
+        SetDDRamAddr(0x10);
         Delay1KTCYx(20);
         putrsXLCD("C");  
     }else if(!PORTCbits.RC7 && PORTCbits.RC4 && !PORTCbits.RC5 && PORTCbits.RC6){
         while(BusyXLCD());
-        SetDDRamAddr(0x00);
+        SetDDRamAddr(0x10);
         Delay1KTCYx(20);
         putrsXLCD("9");  
     }else if(!PORTCbits.RC7 && !PORTCbits.RC4 && PORTCbits.RC5 && PORTCbits.RC6){
         while(BusyXLCD());
-        SetDDRamAddr(0x00);
+        SetDDRamAddr(0x10);
         Delay1KTCYx(20);
         putrsXLCD("8");  
     }else if(!PORTCbits.RC7 && PORTCbits.RC4 && PORTCbits.RC5 && PORTCbits.RC6){
         while(BusyXLCD());
-        SetDDRamAddr(0x00);
+        SetDDRamAddr(0x10);
         Delay1KTCYx(20);
         putrsXLCD("7");  
     }else if(PORTCbits.RC7 && !PORTCbits.RC4 && !PORTCbits.RC5 && !PORTCbits.RC6){
         while(BusyXLCD());
-        SetDDRamAddr(0x00);
+        SetDDRamAddr(0x10);
         Delay1KTCYx(20);
         putrsXLCD("B");  
     }else if(PORTCbits.RC7 && PORTCbits.RC4 && !PORTCbits.RC5 && !PORTCbits.RC6){
         while(BusyXLCD());
-        SetDDRamAddr(0x00);
+        SetDDRamAddr(0x10);
         Delay1KTCYx(20);
         putrsXLCD("6");  
     }else if(PORTCbits.RC7 && !PORTCbits.RC4 && PORTCbits.RC5 && !PORTCbits.RC6){
         while(BusyXLCD());
-        SetDDRamAddr(0x00);
+        SetDDRamAddr(0x10);
         Delay1KTCYx(20);
         putrsXLCD("5");  
     }else if(PORTCbits.RC7 && PORTCbits.RC4 && PORTCbits.RC5 && !PORTCbits.RC6){
         while(BusyXLCD());
-        SetDDRamAddr(0x00);
+        SetDDRamAddr(0x10);
         Delay1KTCYx(20);
         putrsXLCD("4");  
     }else if(PORTCbits.RC7 && !PORTCbits.RC4 && !PORTCbits.RC5 && PORTCbits.RC6){
         while(BusyXLCD());
-        SetDDRamAddr(0x00);
+        SetDDRamAddr(0x10);
         Delay1KTCYx(20);
         putrsXLCD("A");  
     }else if(PORTCbits.RC7 && PORTCbits.RC4 && !PORTCbits.RC5 && PORTCbits.RC6){
         while(BusyXLCD());
-        SetDDRamAddr(0x00);
+        SetDDRamAddr(0x10);
         Delay1KTCYx(20);
         putrsXLCD("3");  
     }else if(PORTCbits.RC7 && !PORTCbits.RC4 && PORTCbits.RC5 && PORTCbits.RC6){
         while(BusyXLCD());
-        SetDDRamAddr(0x00);
+        SetDDRamAddr(0x10);
         Delay1KTCYx(20);
         putrsXLCD("2");  
     }else{
         while(BusyXLCD());
-        SetDDRamAddr(0x00);
+        SetDDRamAddr(0x10);
         Delay1KTCYx(20);
         putrsXLCD("1");  
     }
-    
 }
 
 void appISR(void){
@@ -154,26 +154,9 @@ void appISR(void){
 void main(void){
     
     OSInit();
-            
-    OSTaskCreate(tempTask, (void *)0, &TaskTempStk[0], 1);
-  //  OSTaskCreate(tempEg, (void *)0, &TaskTemp2Stk[0], 2);
-    //tempSem = OSSemCreate(0);
-  
-    
-   // OpenTimer0(TIMER_INT_ON & T0_16BIT & T0_SOURCE_INT & T0_PS_1_1);
-   // WriteTimer0(4377);
-    
-    OpenXLCD(FOUR_BIT & LINES_5X7);
-    while(BusyXLCD());
-    WriteCmdXLCD(DON & CURSOR_OFF & BLINK_OFF); // display on
-    while(BusyXLCD());
-    WriteCmdXLCD(0b00000001); // display clear
-    while(BusyXLCD());
-    WriteCmdXLCD(ENTRY_CURSOR_INC & ENTRY_DISPLAY_NO_SHIFT);
-    
-
        
     INTCONbits.GIEH = 1;
+    //INTCONbits.TMR0IE = 0;
     INTCON3bits.INT1IE = 1;
     INTCON3bits.INT1IF = 0;
     TRISBbits.TRISB1 = 1;
@@ -183,5 +166,23 @@ void main(void){
     TRISCbits.TRISC4 = 1;
     TRISCbits.TRISC7 = 1;
     
+    OpenTimer0(TIMER_INT_ON & T0_16BIT & T0_SOURCE_INT & T0_PS_1_1);
+    WriteTimer0(4377);
+            
+    OSTaskCreate(tempTask, (void *)0, &TaskTempStk[0], 1);
+    OSTaskCreate(heartTask, (void *)0, &TaskHeartStk[0], 2);
+    tempSem = OSSemCreate(1);
+    heartSem = OSSemCreate(1);
+    binSem = OSSemCreate(0);
+    
+    OpenXLCD(FOUR_BIT & LINES_5X7);
+    while(BusyXLCD());
+    WriteCmdXLCD(DON & CURSOR_OFF & BLINK_OFF); // display on
+    while(BusyXLCD());
+    WriteCmdXLCD(0b00000001); // display clear
+    while(BusyXLCD());
+    WriteCmdXLCD(ENTRY_CURSOR_INC & ENTRY_DISPLAY_NO_SHIFT);
+    
     OSStart();
+    
 }
