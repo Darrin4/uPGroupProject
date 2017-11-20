@@ -18,6 +18,6 @@ extern void speakerSound(int freq){
 
 extern void speakerOff(void){
 	TRISCbits.TRISC1 = 1;
-    ClosePWM1();
+    ClosePWM2();
 	CloseTimer2();
 }
