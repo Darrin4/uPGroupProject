@@ -1,4 +1,4 @@
-//Quanley Marieatte - MicroP Lab 1
+//Quanley Marieatte - Group Project Unit Testing Main
 #include <p18f452.h>
 #include <stdio.h>
 #include <delays.h>
@@ -7,9 +7,11 @@
 #include <string.h>
 #include <float.h>
 #include "xlcd.h"
-//#include "tempSensor.h"
+#include "tempSensor.h"
 #include "Speaker.h"
 #include "Keypad.h"
+#include "flashMemory.h"
+
 
 #define _XTAL_FREQ 4000000
 

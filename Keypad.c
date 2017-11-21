@@ -1,9 +1,5 @@
-#include "app_cfg.h"
-#include "INCLUDES.H"
-#include "float.h"
-#include "delays.h"
-#include "tempSensor.h"
-#include <timers.h>
+#include <p18f452.h>
+#include <delays.h>
 #include <string.h>
 #include "keypad.h"
 

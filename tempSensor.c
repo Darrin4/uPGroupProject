@@ -1,8 +1,7 @@
-#include "app_cfg.h"
-#include "INCLUDES.H"
-#include "float.h"
-#include "stdio.h"
-#include "delays.h"
+#include <p18f452.h>
+#include <float.h>
+#include <stdio.h>
+#include <delays.h>
 #include "ow.h"
 
 
