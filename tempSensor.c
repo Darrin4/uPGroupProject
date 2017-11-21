@@ -17,15 +17,15 @@ void convertTemp(void){
     char temperature[20];
     unsigned char deg = 0xDF;
     
-    TRISCbits.TRISC2 = 0;
-    PORTCbits.RC2 = 0;      //Port for pull-up   
+    TRISCbits.TRISC3 = 0;
+    PORTCbits.RC3 = 0;      //Port for pull-up   
     ow_reset();            //Master issues Reset Pulse
 
     ow_write_byte(0xCC);    //Master issues SKIP ROM command
     ow_write_byte(0x44);    //Master issues Convert T command
-    PORTCbits.RC2 = 1;      //Enable pull-up
+    PORTCbits.RC3 = 1;      //Enable pull-up
     Delay10KTCYx(100);
-    PORTCbits.RC2 = 0;      //Disable strong pull-up
+    PORTCbits.RC3 = 0;      //Disable strong pull-up
     ow_reset();
     ow_write_byte(0xCC);
     ow_write_byte(0xBE);
