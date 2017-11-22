@@ -28,7 +28,7 @@ extern unsigned char readBytePISO(){
 	CP1 = 0;
 	for (shifts = 0; shifts < 8; shifts ++){
 		CP1 = 1;
-		data |= CP1;
+		data |= DATAPISO;
 		data = data << 1;
 		CP1 = 0;
 	}
@@ -54,7 +54,7 @@ extern void writeAddrAndData(unsigned int addr, unsigned char data){
 	writeByteSR((unsigned int)data);
 	writeByteSR(addrLow);
 	writeByteSR(addrMed);
-	writeByteSR(addrHig);	
+	writeByteSR(addrHigh);	
 	latchAddrAndData();
 	
 }
@@ -69,7 +69,7 @@ extern void writeAddrSIPO(unsigned int addr){
 	
 	writeByteSR(addrLow);
 	writeByteSR(addrMed);
-	writeByteSR(addrHig);	
+	writeByteSR(addrHigh);	
 	
 }
 

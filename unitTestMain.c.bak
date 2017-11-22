@@ -1,4 +1,4 @@
-//Quanley Marieatte - Unit Testing Main
+//Quanley Marieatte - Group Project Unit Testing Main
 #include <p18f452.h>
 #include <stdio.h>
 #include <delays.h>
@@ -11,6 +11,8 @@
 #include "Speaker.h"
 #include "Keypad.h"
 #include "flashMemory.h"
+
+
 #define _XTAL_FREQ 4000000
 
 #pragma config OSC = HS
@@ -28,27 +30,17 @@ void interrupt_at_high_vector(void){
 #pragma code
 #pragma interrupt appISRHigh
 void appISRHigh(void){
-    unsigned char flashChar = keypadChar();
-    unsigned int addr = 0x0FF1;
     char* msg;    
     if(INTCON3bits.INT1IF){
         INTCON3bits.INT1IF = 0;
-        sprintf(msg,"Char Pressed:%c",flashChar);
+        sprintf(msg,"Char Pressed:%c",keypadChar());
         while(BusyXLCD());
         SetDDRamAddr(0x40);
         while(BusyXLCD());
         putsXLCD(msg);
-//        speakerSound(3000);
-//        Delay1KTCYx(25);
-//        speakerOff();
-        writeDataToFlash(addr, flashChar);
-        Delay10KTCYx(20);
-        flashChar = readFlash(addr);
-        sprintf(msg,"Data in %d : %c",addr,flashChar);
-        while(BusyXLCD());
-        SetDDRamAddr(0x80);
-        while(BusyXLCD());
-        putsXLCD(msg);
+        speakerSound(3000);
+        Delay1KTCYx(25);
+        speakerOff();
     }
 }
 
@@ -66,7 +58,6 @@ void initInterrupts(void);
 void initPorts(void);
 void configLCD(void);
 void initPBInterrupts(void);
-void configFlash(void);
 
 static unsigned char a;
 
@@ -74,13 +65,12 @@ void main (void){
     initPorts();
     initInterrupts();
     configLCD();
-    configFlash();
     
     while(1){
-//        LATBbits.LATB4 = !LATBbits.LATB4;
-//        Delay10KTCYx(100);
-//        LATBbits.LATB4 = !LATBbits.LATB4;
-//        Delay10KTCYx(100);
+        LATBbits.LATB4 = !LATBbits.LATB4;
+        Delay10KTCYx(100);
+        LATBbits.LATB4 = !LATBbits.LATB4;
+        Delay10KTCYx(100);
     }
 }
 
@@ -132,18 +122,4 @@ void configLCD(void){
     //WriteCmdXLCD(ENTRY_CURSOR_INC & ENTRY_DISPLAY_NO_SHIFT);
 }
 
-void configFlash(void){
-    TRISCEFLASH = 0;
-    TRISWEFLASH	= 0;
-    TRISCLKSIPO = 0;
-    TRISSTROBE = 0;
-    TRISOESIPO  = 0;
-    TRISOEDATA  = 0;
-    TRISOEFLASH = 0;
-    TRISDATASIPO = 0;
-    TRISSRPL = 0;
-    TRISCP1 = 0;
-    TRISCP2 = 0;
-    TRISDATAPISO = 1;
-}
 
