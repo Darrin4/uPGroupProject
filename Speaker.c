@@ -21,3 +21,35 @@ extern void speakerOff(void){
     ClosePWM2();
 	CloseTimer2();
 }
+
+extern void beepSpeaker(int note, int delay){
+	//This sound produces a beep on and off for the time delay in ms. 
+	speakerSound(note);
+	Delay1TCYx(delay);
+	speakerOff();
+	Delay1TCYx(delay);
+}
+
+extern void highPriorityAlarm(void){
+	beepSpeaker(C4, 125);
+	beepSpeaker(C4, 125);
+	beepSpeaker(C4, 125);
+	Delay1TCYx(375);	  	//This produces and off time of 500ms the beepSpeaker(C4, 125) puts the speaker off for 125ms so 375ms are left for the 500ms off-time.
+	
+	beepSpeaker(C4, 125);
+	beepSpeaker(C4, 125);
+	Delay10TCYx(87);		//This produces and off time of 1000ms the beepSpeaker(C4, 125) puts the speaker off for 125ms so 875ms are left for the 1000ms off-time.
+}
+
+extern void mediumPriorityAlarm(void){
+	beepSpeaker(C4, 125);
+	beepSpeaker(C4, 125);
+	beepSpeaker(C4, 125);
+	Delay1TCYx(375);
+}
+
+extern void lowPriorityAlarm(void){
+	beepSpeaker(E4, 250);
+	beepSpeaker(C4, 125);
+}
+
