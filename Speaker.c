@@ -50,6 +50,6 @@ extern void mediumPriorityAlarm(void){
 
 extern void lowPriorityAlarm(void){
 	beepSpeaker(E4, 250);
-	beepSpeaker(C4, 125);
+	beepSpeaker(C4, 250);
 }
 
