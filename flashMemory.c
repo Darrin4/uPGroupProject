@@ -56,6 +56,7 @@ extern void writeByteSR(unsigned int data){
 		DATASIPO = (data >> (8 - shifts))&1;
 		CLKSIPO = 0;
 		CLKSIPO = 1;
+        //Delay10KTCYx(10);
 	}
 }
 

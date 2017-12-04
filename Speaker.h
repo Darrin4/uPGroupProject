@@ -5,7 +5,7 @@
 #define D4	294
 #define E4	330
 #define F4	349
-#define F#4	370
+#define Fs4	370
 #define G4	392
 #define A4	440
 #define B4	494
