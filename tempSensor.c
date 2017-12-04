@@ -1,8 +1,7 @@
-#include "app_cfg.h"
-#include "INCLUDES.H"
-#include "float.h"
-#include "stdio.h"
-#include "delays.h"
+#include <p18f452.h>
+#include <float.h>
+#include <stdio.h>
+#include <delays.h>
 #include "ow.h"
 
 
@@ -18,14 +17,14 @@ void convertTemp(void){
     unsigned char deg = 0xDF;
     
     TRISCbits.TRISC3 = 0;
-    PORTCbits.RC3 = 0;          //Port for pull-up   
-    ow_reset();                 //Master issues Reset Pulse
+    PORTCbits.RC3 = 0;      //Port for pull-up   
+    ow_reset();            //Master issues Reset Pulse
 
-    ow_write_byte(0xCC);        //Master issues SKIP ROM command
-    ow_write_byte(0x44);        //Master issues Convert T command
-    PORTCbits.RC3 = 1;          //Enable pull-up
-    Delay10KTCYx(100);          //Delay for Conversion
-    PORTCbits.RC3 = 0;          //Disable strong pull-up
+    ow_write_byte(0xCC);    //Master issues SKIP ROM command
+    ow_write_byte(0x44);    //Master issues Convert T command
+    PORTCbits.RC3 = 1;      //Enable pull-up
+    Delay10KTCYx(100);
+    PORTCbits.RC3 = 0;      //Disable strong pull-up
     ow_reset();
     ow_write_byte(0xCC);
     ow_write_byte(0xBE);
